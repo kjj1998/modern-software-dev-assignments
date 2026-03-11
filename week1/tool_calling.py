@@ -40,7 +40,7 @@ def _list_function_return_types(file_path: str) -> List[Tuple[str, str]]:
     return results
 
 
-def output_every_func_return_type(file_path: str = None) -> str:
+def output_every_func_return_type(file_path: str = None) -> str: # type: ignore
     """Tool: Return a newline-delimited list of "name: return_type" for each top-level function."""
     path = file_path or __file__
     if not os.path.isabs(path):
@@ -70,7 +70,16 @@ TOOL_REGISTRY: Dict[str, Callable[..., str]] = {
 # ==========================
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """You have access to the following tool:
+
+Tool name: output_every_func_return_type
+Description: Returns a newline-delimited list of "name: return_type" for each top-level function in a Python file.
+Parameters:
+  - file_path (string): Path to the Python file to analyze.
+
+To use a tool, respond with ONLY a JSON object in this format, no other text:
+{"tool": "output_every_func_return_type", "args": {"file_path": "tool_calling.py"}}
+"""
 
 
 def resolve_path(p: str) -> str:
@@ -109,7 +118,7 @@ def run_model_for_tool_call(system_prompt: str) -> Dict[str, Any]:
         options={"temperature": 0.3},
     )
     content = response.message.content
-    return extract_tool_call(content)
+    return extract_tool_call(content) # type: ignore
 
 
 def execute_tool_call(call: Dict[str, Any]) -> str:
