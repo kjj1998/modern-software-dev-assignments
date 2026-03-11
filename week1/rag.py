@@ -37,7 +37,7 @@ QUESTION = (
 
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = "You are a Python coding assistant. Use only the context provided to write code. Do not assume any information not given in the context."
 
 
 # For this simple example
@@ -56,7 +56,7 @@ def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
 
     For example, return [] to simulate missing context, or [corpus[0]] to include the API docs.
     """
-    return []
+    return [corpus[0]]
 
 
 def make_user_prompt(question: str, context_docs: List[str]) -> str:
@@ -105,7 +105,7 @@ def test_your_prompt(system_prompt: str, context_provider: Callable[[List[str]],
             options={"temperature": 0.0},
         )
         output_text = response.message.content
-        code = extract_code_block(output_text)
+        code = extract_code_block(output_text) # type: ignore
         missing = [s for s in REQUIRED_SNIPPETS if s not in code]
         if not missing:
             print(output_text)
