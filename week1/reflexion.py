@@ -15,7 +15,7 @@ Keep the implementation minimal.
 """
 
 # TODO: Fill this in!
-YOUR_REFLEXION_PROMPT = ""
+YOUR_REFLEXION_PROMPT = "Based on the failing checks, identify the errors in the code and correct them"
 
 
 # Ground-truth test suite used to evaluate generated code
@@ -44,7 +44,7 @@ def load_function_from_code(code_str: str) -> Callable[[str], bool]:
     func = namespace.get("is_valid_password")
     if not callable(func):
         raise ValueError("No callable is_valid_password found in generated code")
-    return func
+    return func # type: ignore
 
 
 def evaluate_function(func: Callable[[str], bool]) -> Tuple[bool, List[str]]:
@@ -88,7 +88,7 @@ def generate_initial_function(system_prompt: str) -> str:
         ],
         options={"temperature": 0.2},
     )
-    return extract_code_block(response.message.content)
+    return extract_code_block(response.message.content) # type: ignore
 
 
 def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
@@ -96,7 +96,7 @@ def your_build_reflexion_context(prev_code: str, failures: List[str]) -> str:
 
     Return a string that will be sent as the user content alongside the reflexion system prompt.
     """
-    return ""
+    return f"Your function: {prev_code} failed with the following errors: {failures}"
 
 
 def apply_reflexion(
@@ -115,7 +115,7 @@ def apply_reflexion(
         ],
         options={"temperature": 0.2},
     )
-    return extract_code_block(response.message.content)
+    return extract_code_block(response.message.content) # type: ignore
 
 
 def run_reflexion_flow(
