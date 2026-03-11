@@ -7,7 +7,19 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+input: cat
+output: tac
+
+input: hello
+output: olleh
+
+input: httpserver
+output: revresptth
+
+input: httperror
+output: rorreptth
+"""
 
 USER_PROMPT = """
 Reverse the order of letters in the following word. Only output the reversed word, no other text:
@@ -33,7 +45,7 @@ def test_your_prompt(system_prompt: str) -> bool:
             ],
             options={"temperature": 0.5},
         )
-        output_text = response.message.content.strip()
+        output_text = response.message.content.strip() # type: ignore
         if output_text.strip() == EXPECTED_OUTPUT.strip():
             print("SUCCESS")
             return True

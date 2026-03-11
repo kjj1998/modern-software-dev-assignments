@@ -8,7 +8,23 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+What is 7^{200} (mod 100)?
+
+Step 1: Find the cycle of 7^n mod 100.
+7^1 mod 100 = 7
+7^2 mod 100 = 49
+7^3 mod 100 = 43
+7^4 mod 100 = 1
+
+Step 2: The cycle length is 4: [7, 49, 43, 1].
+
+Step 3: Find 200 mod 4 = 0. A remainder of 0 means we use the last value in the cycle.
+
+Step 4: The last value is 1.
+
+Answer: 1
+"""
 
 
 USER_PROMPT = """
@@ -56,7 +72,7 @@ def test_your_prompt(system_prompt: str) -> bool:
             options={"temperature": 0.3},
         )
         output_text = response.message.content
-        final_answer = extract_final_answer(output_text)
+        final_answer = extract_final_answer(output_text) # type: ignore
         if final_answer.strip() == EXPECTED_OUTPUT.strip():
             print("SUCCESS")
             return True
