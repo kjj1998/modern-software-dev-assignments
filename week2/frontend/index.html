@@ -12,6 +12,8 @@
       .items { margin-top: 1rem; }
       .item { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; }
       .muted { color: #6b7280; font-size: 0.875rem; }
+      .note { border: 1px solid #e5e7eb; border-radius: 0.25rem; padding: 0.5rem; margin-top: 0.5rem; }
+      .note-meta { font-size: 0.75rem; color: #9ca3af; }
       .row { display: flex; gap: 0.5rem; align-items: center; }
     </style>
   </head>
@@ -24,20 +26,23 @@
     <div class="row">
       <label class="row"><input id="save_note" type="checkbox" checked /> Save as note</label>
       <button id="extract">Extract</button>
+      <button id="extract-llm">Extract LLM</button>
+      <button id="list-notes">List Notes</button>
     </div>
 
     <div class="items" id="items"></div>
+    <div id="notes"></div>
 
     <script>
       const $ = (sel) => document.querySelector(sel);
       const itemsEl = $('#items');
-      const btn = $('#extract');
-      btn.addEventListener('click', async () => {
+
+      async function doExtract(endpoint) {
         const text = $('#text').value;
         const save = $('#save_note').checked;
         itemsEl.textContent = 'Extracting...';
         try {
-          const res = await fetch('/action-items/extract', {
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, save_note: save }),
@@ -64,6 +69,29 @@
         } catch (err) {
           console.error(err);
           itemsEl.textContent = 'Error extracting items';
+        }
+      }
+
+      $('#extract').addEventListener('click', () => doExtract('/action-items/extract'));
+      $('#extract-llm').addEventListener('click', () => doExtract('/action-items/extract-llm'));
+
+      $('#list-notes').addEventListener('click', async () => {
+        const notesEl = $('#notes');
+        notesEl.textContent = 'Loading...';
+        try {
+          const res = await fetch('/notes');
+          if (!res.ok) throw new Error('Request failed');
+          const data = await res.json();
+          if (data.length === 0) {
+            notesEl.innerHTML = '<p class="muted">No notes saved.</p>';
+            return;
+          }
+          notesEl.innerHTML = data.map(n =>
+            `<div class="note"><div>${n.content}</div><div class="note-meta">ID: ${n.id} | ${n.created_at}</div></div>`
+          ).join('');
+        } catch (err) {
+          console.error(err);
+          notesEl.textContent = 'Error loading notes';
         }
       });
 
